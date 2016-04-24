@@ -6,6 +6,7 @@
     "node": "5.10.1"
   },
   "dependencies": {
+    "cheerio": "^0.20.0",
     "request": "^2.72.0",
     "restify": "^4.0.4",
     "trim": "0.0.1"

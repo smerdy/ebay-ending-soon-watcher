@@ -1,0 +1,13 @@
+{
+  "name": "ebay-ending-watcher",
+  "description": "Node.js microservice to watch ending items on eBay.",
+  "repository": "https://github.com/movstox/ebay-ending-watcher",
+  "logo": "https://node-js-sample.herokuapp.com/node.png",
+  "keywords": ["node", "api", "static"],
+  "env": {
+  },
+  "addons": [
+    "logentries:le_tryit",
+    "airbrake:free_heroku"
+  ]
+}

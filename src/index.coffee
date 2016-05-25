@@ -18,7 +18,7 @@ server.get '/ebay-ending-soon/:name', (req, res, next) ->
       $ = cheerio.load(body)
       itemsData = for ebayListing in $('.sresult')[..5] # take 5 items
           title: trim($(ebayListing).find('h3.lvtitle').text())
-          price: parseFloat(trim($(ebayListing).find('.lvprice').text()).replace(/\$/, ''))
+          price: parseFloat(trim($(ebayListing).find('.lvprice').text()).replace(/[\$\,]/, '')
           endsAt: parseInt($(ebayListing).find('.timeleft .timeMs').attr('timems'))
           itemListingUrl: ($(ebayListing).find('.lvtitle a').attr('href'))
           itemPictureUrl: ($(ebayListing).find('.lvpic img').attr('src'))

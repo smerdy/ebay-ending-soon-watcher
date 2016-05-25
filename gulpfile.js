@@ -1,4 +1,5 @@
 var gulp = require('gulp');
+var babel = require('gulp-babel');
 var coffee = require('gulp-coffee');
 var uglify = require('gulp-uglify');
 var nodemon = require('gulp-nodemon');
@@ -22,6 +23,9 @@ gulp.task('scripts', ['clean'], function() {
   return gulp.src(paths.scripts)
     .pipe(coffee())
     .pipe(uglify())
+    .pipe(babel({
+        presets: ['es2015']
+    }))
     .pipe(concat('app.min.js'))
     .pipe(gulp.dest('dist'));
 });

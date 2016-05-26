@@ -13,7 +13,7 @@ server.use restify.acceptParser(server.acceptable)
 server.use restify.queryParser()
 server.use restify.bodyParser()
 server.get '/ebay-ending-soon/:name', (req, res, next) ->
-  request "http://www.ebay.com/sch/i.html?_from=R40&_sacat=0&_nkw=#{req.params.name}&_sop=1&_udlo=#{req.params.price_low}&_udhi=#{req.params.price_high}", (error, response, body) ->
+  request "http://www.ebay.com/sch/i.html?_from=R40&_sacat=0&_nkw=#{req.params.name}&_sop=1&_udlo=#{req.params.price_low}&_udhi=#{req.params.price_high}&LH_ItemCondition=1000|1500|3000", (error, response, body) ->
     if response.statusCode == 200
       $ = cheerio.load(body)
       itemsData = for ebayListing in $('.sresult')[..5] # take 5 items

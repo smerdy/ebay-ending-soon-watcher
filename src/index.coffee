@@ -17,6 +17,7 @@ server.get '/ebay-ending-soon/:name', (req, res, next) ->
   lh_sold = req.params.LH_Sold || 0
   lh_bin = req.params.LH_BIN || 0
   search_url = "http://www.ebay.com/sch/i.html?_from=R40&_sacat=0&_nkw=#{req.params.name}&_sop=1&_udlo=#{req.params.price_low}&_udhi=#{req.params.price_high}&LH_Complete=#{lh_complete}&LH_Sold=#{req.params.lh_sold}&LH_BIN=#{req.params.lh_bin}&LH_ItemCondition=1000|1500|3000"
+  
   console.log search_url
   request search_url, (error, response, body) ->
     if response.statusCode == 200

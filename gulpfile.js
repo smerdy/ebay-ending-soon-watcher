@@ -1,14 +1,12 @@
 var gulp = require('gulp');
 var babel = require('gulp-babel');
-var coffee = require('gulp-coffee');
 var uglify = require('gulp-uglify');
 var nodemon = require('gulp-nodemon');
 var concat = require('gulp-concat');
 var del = require('del');
-var mocha = require('gulp-mocha');
 
 var paths = {
-    scripts: ['src/**/*.coffee']
+    scripts: ['src/**/*.js']
 };
 
 // Not all tasks need to use streams
@@ -23,20 +21,13 @@ gulp.task('scripts', ['clean'], function() {
     // with sourcemaps all the way down
     return gulp
         // gulp-mocha needs filepaths so you can't have any plugins before it 
-        .pipe(mocha({ reporter: 'nyan' }))
-        .pipe(coffee())
-        .pipe(uglify())
+        .src(paths.scripts)
         .pipe(babel({
             presets: ['es2015']
         }))
+        .pipe(uglify())
         .pipe(concat('app.min.js'))
         .pipe(gulp.dest('dist'));
-});
-
-gulp.task('test',  function ()  {
-    return  gulp.src('test.js',   { read:  false })
-        // gulp-mocha needs filepaths so you can't have any plugins before it 
-        .pipe(mocha({ reporter:   'nyan' }));
 });
 
 gulp.task('start', function() {
@@ -52,4 +43,4 @@ gulp.task('watch', function() {
     gulp.watch(paths.scripts, ['scripts']);
 });
 // The default task (called when you run `gulp` from cli)
-gulp.task('default', ['scripts', 'test', 'watch', 'start']);
+gulp.task('default', ['scripts', 'watch', 'start']);

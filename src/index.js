@@ -8,7 +8,7 @@
   require('dotenv').config({path: __dirname + '/.env'});
 }*/
 
-const NUM_HOURS = 24 * 7;
+const NUM_HOURS = 12;
 const TODAY = new Date();
 
 //Lets require/import the HTTP module
@@ -21,11 +21,6 @@ const server = restify.createServer({
   version: '1.0.0'});
 // add any additional custom server configuration
 
-function time(ms) {
-    var datestring = new Date(ms).toISOString().slice(11, -1);
-    return datestring;
-}
-
 server.use(restify.acceptParser(server.acceptable));
 server.use(restify.queryParser());
 server.use(restify.bodyParser());
@@ -34,7 +29,7 @@ server.get('/ebay-ending-soon/:name', function(req, res, next) {
   const lh_sold = req.params.LH_Sold || 0;
   const lh_bin = req.params.LH_BIN || 0;
 
-  const search_url = 'http://www.ebay.com/sch/i.html?_from=R40&_sacat=0&_nkw=' + req.params.name + '&_sop=1&_udlo=' + req.params.price_low + '&_udhi=' + req.params.price_high + '&LH_Complete=' + lh_complete + '&LH_Sold=' + lh_sold + '&LH_BIN=' + lh_bin + '&LH_ItemCondition=1000|1500|3000';
+  const search_url = 'http://www.ebay.com/sch/i.html?_from=R40&_sacat=0&_nkw=' + req.params.name + '&_sop=1&_udlo=' + req.params.price_low + '&_udhi=' + req.params.price_high + '&LH_Complete=' + lh_complete + '&LH_Sold=' + lh_sold + '&LH_BIN=' + lh_bin + '&LH_ItemCondition=1000|1500|3000&_ipg=200&rt=nc';
 
   console.log(search_url);
   request(search_url, function(error, response, body) {
@@ -53,12 +48,13 @@ server.get('/ebay-ending-soon/:name', function(req, res, next) {
           return false
         })
         .map(function(ebayListing) {
-          var timeLeftMs = $(ebayListing).find('.timeleft .timeMs').attr('timems');
+          var endTime = new Date();
+          endTime.setTime(parseInt($(ebayListing).find('.timeleft .timeMs').attr('timems')));
 
           return {
             title: trim($(ebayListing).find('h3.lvtitle').text()),
             price: parseFloat(trim($(ebayListing).find('.lvprice').text()).replace(',', '').replace('$','')),
-            endsAt: parseInt($(ebayListing).find('.timeleft .timeMs').attr('timems')),
+            endsAt: endTime.toString(),
             itemListingUrl: ($(ebayListing).find('.lvtitle a').attr('href')),
             itemPictureUrl: ($(ebayListing).find('.lvpic img').attr('src'))
           }

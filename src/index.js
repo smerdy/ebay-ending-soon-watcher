@@ -11,16 +11,16 @@ var ebayOptions = {
   'price_high': 1000
 };
 
-var job = new CronJob('00 11 04 * * 1-7', function() {
+var job = new CronJob('00 20 04 * * 1-7', function() {
   /*
    * Runs every weekday (Monday through Friday)
    * at 11:30:00 AM. It does not run on Saturday
    * or Sunday.
    */
     ebayFetch(ebayOptions, function(ebayItems) {
-      var formattedItems = ebayItems.map((item) => "<p>" + item.endsAt + "</p>").join();
+      // var formattedItems = ebayItems.map((item) => "<p>" + item.endsAt + "</p>").join();
       var mailOptions = {
-        'HTMLbody': formattedItems,
+        'ebayItems': ebayItems,
         'subject': ebayOptions.name
       }
       mailer(mailOptions)

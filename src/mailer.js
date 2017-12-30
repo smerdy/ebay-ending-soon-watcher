@@ -21,17 +21,12 @@ module.exports = (mailOptions) => {
       }
   });
 
-  var htmlBody = mailOptions.ebayItems
-    .map(function(item) {
-      return '<a href="' + item.itemListingUrl + '">' + item.title + '</a><img src="' + item.itemPictureUrl + '"><p>' + item.price + '</p><p>' + item.endsAt + '</p>'
-    }).join('<br>')
-
   // Message object
   let message = {
       from: config.email,
       to: config.email,
       subject: mailOptions.subject,
-      html: htmlBody
+      html: mailOptions.htmlBody
   };
 
   transporter.sendMail(message, (err, info) => {

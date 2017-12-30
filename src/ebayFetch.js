@@ -3,10 +3,21 @@
 const trim = require('trim');
 const request = require('request');
 const cheerio = require('cheerio');
-const NUM_HOURS = 72;
 const TODAY = new Date();
 
-module.exports = (ebayOptions, callback) => {
+function convertMS(ms) {
+  var d, h, m, s;
+  s = Math.floor(ms / 1000);
+  m = Math.floor(s / 60);
+  s = s % 60;
+  h = Math.floor(m / 60);
+  m = m % 60;
+  d = Math.floor(h / 24);
+  h = h % 24;
+  return { d: d, h: h, m: m, s: s };
+};
+
+module.exports = (ebayOptions, hour_gap, sendItems) => {
   //Lets require/import the HTTP module
 
   const search_url = 'http://www.ebay.com/sch/i.html?_from=R40&_sacat=0&_nkw=' + ebayOptions.name + '&_sop=1&_udlo=' + ebayOptions.price_low + '&_udhi=' + ebayOptions.price_high + '&LH_ItemCondition=1000|1500|3000&_ipg=200&rt=nc';
@@ -22,7 +33,7 @@ module.exports = (ebayOptions, callback) => {
           if (timeLeftMs) {
             var endingDate = new Date()
             endingDate.setTime(timeLeftMs)
-            if (endingDate - TODAY <= 1000 * 60 * 60 * NUM_HOURS)
+            if (endingDate - TODAY <= 1000 * 60 * 60 * hour_gap)
               return true
           }
           return false
@@ -30,17 +41,19 @@ module.exports = (ebayOptions, callback) => {
         .map(function(ebayListing) {
           var endTime = new Date();
           endTime.setTime(parseInt($(ebayListing).find('.timeleft .timeMs').attr('timems')));
+          var timeRemaining = convertMS(endTime - TODAY);
+          var timeRemainingStr = timeRemaining.h + 'h ' + timeRemaining.m + 'm';
 
           return {
             title: trim($(ebayListing).find('h3.lvtitle').text()),
             price: parseFloat(trim($(ebayListing).find('.lvprice').text()).replace(',', '').replace('$','')),
-            endsAt: endTime.toString(),
+            endsAt: timeRemainingStr,//endTime.toString(),
             itemListingUrl: ($(ebayListing).find('.lvtitle a').attr('href')),
             itemPictureUrl: ($(ebayListing).find('.lvpic img').attr('src'))
           }
         });
-      // send cron job with itemsData formatted into email.
-      callback(itemsData);
+
+      sendItems(itemsData);
     }
   });
 }

@@ -5,25 +5,38 @@ import ebayFetch from './../src/ebayFetch'
 
 const CronJob = require('cron').CronJob;
 
+const hour_gap = 6;
+
 var ebayOptions = {
   'name': 'fujifilm+x-t1',
-  'price_low': 400,
-  'price_high': 1000
+  'price_low': 300,
+  'price_high': 400
 };
 
-var job = new CronJob('00 20 04 * * 1-7', function() {
-  /*
-   * Runs every weekday (Monday through Friday)
-   * at 11:30:00 AM. It does not run on Saturday
-   * or Sunday.
-   */
-    ebayFetch(ebayOptions, function(ebayItems) {
+// final string: '00 00 0-23/' + String(hour_gap) + ' * * *'
+var job = new CronJob('00 0-59/1 * * * *', function() {
+    ebayFetch(ebayOptions, hour_gap, function(ebayItems) {
       // var formattedItems = ebayItems.map((item) => "<p>" + item.endsAt + "</p>").join();
-      var mailOptions = {
-        'ebayItems': ebayItems,
-        'subject': ebayOptions.name
+
+      if (ebayItems.length > 0) {
+        var htmlBody = ebayItems.map(function(item) {
+            return '<a href="' + item.itemListingUrl + '">' + item.title + '</a><img src="' + item.itemPictureUrl + '"><p>' + item.price + '</p><p>' + item.endsAt + '</p>'
+          }).join('<br>')
+
+        var mailOptions = {
+          'htmlBody': htmlBody,
+          'subject': ebayOptions.name
+        }
+
+        mailer(mailOptions)
       }
-      mailer(mailOptions)
+      else {
+        var mailOptions = {
+          'htmlBody': 'No items found!',
+          'subject': ebayOptions.name
+        }
+        mailer(mailOptions);
+      }
     });
 
   }, function () {

@@ -27,7 +27,7 @@ var job = new CronJob('00 00 0-23/' + String(hour_gap) + ' * * *', function() {
         mailer(mailOptions)
       }
       else {
-        console.log("no items to email")
+        // console.log("no items to email")
       }
     });
 
@@ -35,5 +35,7 @@ var job = new CronJob('00 00 0-23/' + String(hour_gap) + ' * * *', function() {
     /* This function is executed when the job stops */
   },
   true, /* Start the job right now */
-  'America/Los_Angeles' /* Time zone of this job. */
+  'America/Los_Angeles', /* Time zone of this job. */
+  undefined,
+  true
 );

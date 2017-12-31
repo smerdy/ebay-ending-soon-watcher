@@ -5,10 +5,10 @@ import ebayFetch from './../src/ebayFetch'
 
 const CronJob = require('cron').CronJob;
 
-const hour_gap = 6;
+const hour_gap = 72;
 
 var ebayOptions = {
-  'name': 'fujifilm x-t1',
+  'query': 'fujifilm x-t1',
   'price_low': 300,
   'price_high': 400
 };
@@ -20,12 +20,12 @@ var job = new CronJob('0-59/10 * * * * *', function() {
 
       if (ebayItems.length > 0) {
         var htmlBody = ebayItems.map(function(item) {
-            return '<a href="' + item.itemListingUrl + '">' + item.title + '</a><img src="' + item.itemPictureUrl + '"><p>' + item.price + '</p><p>' + item.endsAt + '</p>'
+            return '<a href="' + item.url + '">' + item.title + '</a><img src="' + item.picURL + '"><p>' + item.price + '</p><p>' + item.hoursLeft + ' hours left</p>'
           }).join('<br>')
 
         var mailOptions = {
           'htmlBody': htmlBody,
-          'subject': ebayOptions.name
+          'subject': ebayOptions.query
         }
 
         mailer(mailOptions)
@@ -33,7 +33,7 @@ var job = new CronJob('0-59/10 * * * * *', function() {
       else {
         var mailOptions = {
           'htmlBody': 'No items found!',
-          'subject': ebayOptions.name
+          'subject': ebayOptions.query
         }
         mailer(mailOptions);
       }

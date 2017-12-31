@@ -5,6 +5,7 @@ const ebay = require('ebay-api');
 const request = require('request');
 const cheerio = require('cheerio');
 const fs = require('fs');
+const moment = require('moment');
 const ebayConfig = JSON.parse(fs.readFileSync('src/config.json')).ebay;
 
 function convertMS(ms) {
@@ -22,12 +23,13 @@ function convertMS(ms) {
 module.exports = (ebayOptions, hour_gap, sendItems) => {
 
   var params = {
-    keywords: ebayOptions.name.split(' '),
+    keywords: ebayOptions.query.split(' '),
     paginationInput: {
       entriesPerPage: 10
     },
     itemFilter: [
-      {name: 'MaxPrice', value: '900'}
+      {name: 'MaxPrice', value: '900'},
+      {name: 'MinPrice', value: '350'}
     ],
     sortOrder: 'EndingTimeSoonest'
   };
@@ -51,53 +53,24 @@ module.exports = (ebayOptions, hour_gap, sendItems) => {
 
       console.log('Found', items.length, 'items');
 
-      for (var i = 0; i < items.length; i++) {
-        console.log('- ' + items[i].title);
-      }
+      var parsedItems = items.map(function(item) {
+        var timeLeft = moment.duration(item.sellingStatus.timeLeft);
+
+        if (timeLeft.asMilliseconds() > 60 * 60 * 1000 * hour_gap)
+          return false;
+
+        return {
+          title: item.title,
+          price: item.sellingStatus.currentPrice.amount,
+          hoursLeft: timeLeft.asHours(),
+          picURL: item.galleryURL,
+          url: item.viewItemURL
+        }
+      }).filter(Boolean);
+
+      console.log(parsedItems)
+
+      sendItems(parsedItems);
     }
   );
-/*
-  request(search_url, function(error, response, body) {
-    var TODAY = new Date();
-
-    if (response.statusCode === 200) {
-      const $ = cheerio.load(body);
-      const itemsData = Array.from($('.sresult'))
-        .filter((ebayListing) => {
-          var timeLeftMs = $(ebayListing).find('.timeleft .timeMs').attr('timems');
-          if (timeLeftMs == undefined) {
-            console.log($(ebayListing).html())
-          }
-          console.log($(ebayListing).find('h3.lvtitle').text());
-
-          if (timeLeftMs) {
-            var endingDate = new Date()
-            endingDate.setTime(timeLeftMs)
-            // console.log(endingDate)
-            // console.log((endingDate - TODAY) / 60 / 60 / 1000);
-            if (endingDate - TODAY <= 1000 * 60 * 60 * hour_gap) {
-              // console.log('Within time bound:');
-              return true
-            }
-          }
-          return false
-        })
-        .map((ebayListing) => {
-          var endTime = new Date();
-          endTime.setTime(parseInt($(ebayListing).find('.timeleft .timeMs').attr('timems')));
-          var timeRemaining = convertMS(endTime - TODAY);
-          var timeRemainingStr = timeRemaining.h + 'h ' + timeRemaining.m + 'm';
-
-          return {
-            title: trim($(ebayListing).find('h3.lvtitle').text()),
-            price: parseFloat(trim($(ebayListing).find('.lvprice').text()).replace(',', '').replace('$','')),
-            endsAt: timeRemainingStr,//endTime.toString(),
-            itemListingUrl: ($(ebayListing).find('.lvtitle a').attr('href')),
-            itemPictureUrl: ($(ebayListing).find('.lvpic img').attr('src'))
-          }
-        });
-
-      sendItems(itemsData);
-    }
-  });*/
 }

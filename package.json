@@ -40,7 +40,8 @@
     "mocha": "*",
     "nodemailer": "^4.4.1",
     "nodemon": "^1.9.1",
-    "ebay-api": "^1.13.7"
+    "ebay-api": "^1.13.7",
+    "moment": "^2.20.1"
   },
   "license": "MIT"
 }

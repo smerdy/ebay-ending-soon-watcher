@@ -1,9 +1,11 @@
 'use strict'
 
 const trim = require('trim');
+const ebay = require('ebay-api');
 const request = require('request');
 const cheerio = require('cheerio');
-const TODAY = new Date();
+const fs = require('fs');
+const ebayConfig = JSON.parse(fs.readFileSync('src/config.json')).ebay;
 
 function convertMS(ms) {
   var d, h, m, s;
@@ -18,27 +20,69 @@ function convertMS(ms) {
 };
 
 module.exports = (ebayOptions, hour_gap, sendItems) => {
-  //Lets require/import the HTTP module
 
-  const search_url = 'http://www.ebay.com/sch/i.html?_from=R40&_sacat=0&_nkw=' + ebayOptions.name + '&_sop=1&_udlo=' + ebayOptions.price_low + '&_udhi=' + ebayOptions.price_high + '&LH_ItemCondition=1000|1500|3000&_ipg=200&rt=nc';
+  var params = {
+    keywords: ebayOptions.name.split(' '),
+    paginationInput: {
+      entriesPerPage: 10
+    },
+    itemFilter: [
+      {name: 'MaxPrice', value: '900'}
+    ],
+    sortOrder: 'EndingTimeSoonest'
+  };
 
-  console.log(search_url);
+
+  ebay.xmlRequest({
+      serviceName: 'Finding',
+      opType: 'findItemsByKeywords',
+      devId: ebayConfig.devId,
+      certId: ebayConfig.certId,
+      appId: ebayConfig.appId,
+      authToken: ebayConfig.authToken,
+      params: params,
+      parser: ebay.parseResponseJson    // (default)
+    },
+    // gets all the items together in a merged array
+    function itemsCallback(error, itemsResponse) {
+      if (error) throw error;
+
+      var items = itemsResponse.searchResult.item;
+
+      console.log('Found', items.length, 'items');
+
+      for (var i = 0; i < items.length; i++) {
+        console.log('- ' + items[i].title);
+      }
+    }
+  );
+/*
   request(search_url, function(error, response, body) {
+    var TODAY = new Date();
+
     if (response.statusCode === 200) {
       const $ = cheerio.load(body);
       const itemsData = Array.from($('.sresult'))
-        .filter(function(ebayListing) {
-          var timeLeftMs = parseInt($(ebayListing).find('.timeleft .timeMs').attr('timems'));
+        .filter((ebayListing) => {
+          var timeLeftMs = $(ebayListing).find('.timeleft .timeMs').attr('timems');
+          if (timeLeftMs == undefined) {
+            console.log($(ebayListing).html())
+          }
+          console.log($(ebayListing).find('h3.lvtitle').text());
 
           if (timeLeftMs) {
             var endingDate = new Date()
             endingDate.setTime(timeLeftMs)
-            if (endingDate - TODAY <= 1000 * 60 * 60 * hour_gap)
+            // console.log(endingDate)
+            // console.log((endingDate - TODAY) / 60 / 60 / 1000);
+            if (endingDate - TODAY <= 1000 * 60 * 60 * hour_gap) {
+              // console.log('Within time bound:');
               return true
+            }
           }
           return false
         })
-        .map(function(ebayListing) {
+        .map((ebayListing) => {
           var endTime = new Date();
           endTime.setTime(parseInt($(ebayListing).find('.timeleft .timeMs').attr('timems')));
           var timeRemaining = convertMS(endTime - TODAY);
@@ -55,5 +99,5 @@ module.exports = (ebayOptions, hour_gap, sendItems) => {
 
       sendItems(itemsData);
     }
-  });
+  });*/
 }

@@ -13,7 +13,7 @@ module.exports = (mailOptions) => {
       secure: false,
       port: 25,
       auth: {
-        user: config.email,
+        user: config.email, 
         pass: config.password
       },
       tls: {

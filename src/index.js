@@ -8,13 +8,13 @@ const CronJob = require('cron').CronJob;
 const hour_gap = 6;
 
 var ebayOptions = {
-  'name': 'fujifilm+x-t1',
+  'name': 'fujifilm x-t1',
   'price_low': 300,
   'price_high': 400
 };
 
 // final string: '00 00 0-23/' + String(hour_gap) + ' * * *'
-var job = new CronJob('00 0-59/1 * * * *', function() {
+var job = new CronJob('0-59/10 * * * * *', function() {
     ebayFetch(ebayOptions, hour_gap, function(ebayItems) {
       // var formattedItems = ebayItems.map((item) => "<p>" + item.endsAt + "</p>").join();
 

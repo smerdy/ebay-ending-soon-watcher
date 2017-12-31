@@ -20,7 +20,6 @@ gulp.task('scripts', ['clean'], function() {
     // Minify and copy all JavaScript (except vendor scripts)
     // with sourcemaps all the way down
     return gulp
-        // gulp-mocha needs filepaths so you can't have any plugins before it 
         .src(paths.scripts)
         .pipe(babel({
             presets: ['es2015']
@@ -29,7 +28,7 @@ gulp.task('scripts', ['clean'], function() {
         .pipe(concat('app.min.js'))
         .pipe(gulp.dest('dist'));
 });
-
+ 
 gulp.task('start', function() {
     nodemon({
         script: 'dist/app.min.js',

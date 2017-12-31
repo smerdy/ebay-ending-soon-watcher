@@ -36,7 +36,7 @@ module.exports = (ebayOptions, hour_gap, sendItems) => {
 
       var items = itemsResponse.searchResult.item;
 
-      console.log('Found', items.length, 'items');
+      console.log('Found', items.length, 'items. Going to send...');
 
       var parsedItems = items.map(function(item) {
         var timeLeft = moment.duration(item.sellingStatus.timeLeft);
@@ -53,7 +53,7 @@ module.exports = (ebayOptions, hour_gap, sendItems) => {
         }
       }).filter(Boolean);
 
-      console.log(parsedItems)
+      // console.log(parsedItems)
 
       sendItems(parsedItems);
     }

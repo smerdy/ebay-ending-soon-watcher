@@ -5,17 +5,16 @@ import ebayFetch from './../src/ebayFetch'
 
 const CronJob = require('cron').CronJob;
 
-const hour_gap = 72;
+const hour_gap = 8;
 
 var ebayOptions = {
-  'query': 'fujifilm x-t1',
-  'price_low': 300,
-  'price_high': 400
+  'query': 'fujifilm x-t1 lens',
+  'price_low': 400,
+  'price_high': 610
 };
 
-
 // final string: '00 00 0-23/' + String(hour_gap) + ' * * *'
-var job = new CronJob('0-59/10 * * * * *', function() {
+var job = new CronJob('00 00 0-23/' + String(hour_gap) + ' * * *', function() {
     ebayFetch(ebayOptions, hour_gap, function(ebayItems) {
 
       if (ebayItems.length > 0) {

@@ -28,7 +28,7 @@ gulp.task('scripts', ['clean'], function() {
         .pipe(concat('app.min.js'))
         .pipe(gulp.dest('dist'));
 });
- 
+
 gulp.task('start', function() {
     nodemon({
         script: 'dist/app.min.js',

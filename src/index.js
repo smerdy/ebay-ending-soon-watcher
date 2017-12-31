@@ -19,9 +19,6 @@ var job = new CronJob('0-59/10 * * * * *', function() {
     ebayFetch(ebayOptions, hour_gap, function(ebayItems) {
 
       if (ebayItems.length > 0) {
-        // var htmlBody = ebayItems.map(function(item) {
-        //     return '<a href="' + item.url + '">' + item.title + '</a><img src="' + item.picURL + '"><p>' + item.price + '</p><p>' + item.hoursLeft + ' hours left</p>'
-        //   }).join('<br>')
 
         var mailOptions = {
           'ebayItems': ebayItems,

@@ -27,12 +27,15 @@ module.exports = (mailOptions) => {
       from: 'joshua.pham@gmail.com'
     },
     // uncomment below to send emails in development/test env:
-    // send: true
+    send: true,
+    preview: false,
+    juice: false,
+    htmlToText: false,
     transport: transporter
   });
 
   email.send({
-    template: 'mars',
+    template: 'endingSoonNotification',
     message: {
       to: 'joshua.pham@gmail.com'
     },
@@ -41,22 +44,4 @@ module.exports = (mailOptions) => {
       'subject': mailOptions.subject
     }
   }).then(console.log).catch(console.error);
-
-
-  // Message object
-  let message = {
-      from: config.email,
-      to: config.email,
-      subject: mailOptions.subject,
-      html: mailOptions.htmlBody
-  };
-
-  transporter.sendMail(message, (err, info) => {
-      if (err) {
-          console.log('Error occurred. ' + err);
-      }
-
-      console.log('Message sent: %s', info);
-  });
-
 }

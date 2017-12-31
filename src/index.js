@@ -13,29 +13,25 @@ var ebayOptions = {
   'price_high': 400
 };
 
+
 // final string: '00 00 0-23/' + String(hour_gap) + ' * * *'
 var job = new CronJob('0-59/10 * * * * *', function() {
     ebayFetch(ebayOptions, hour_gap, function(ebayItems) {
-      // var formattedItems = ebayItems.map((item) => "<p>" + item.endsAt + "</p>").join();
 
       if (ebayItems.length > 0) {
-        var htmlBody = ebayItems.map(function(item) {
-            return '<a href="' + item.url + '">' + item.title + '</a><img src="' + item.picURL + '"><p>' + item.price + '</p><p>' + item.hoursLeft + ' hours left</p>'
-          }).join('<br>')
+        // var htmlBody = ebayItems.map(function(item) {
+        //     return '<a href="' + item.url + '">' + item.title + '</a><img src="' + item.picURL + '"><p>' + item.price + '</p><p>' + item.hoursLeft + ' hours left</p>'
+        //   }).join('<br>')
 
         var mailOptions = {
-          'htmlBody': htmlBody,
+          'ebayItems': ebayItems,
           'subject': ebayOptions.query
         }
 
         mailer(mailOptions)
       }
       else {
-        var mailOptions = {
-          'htmlBody': 'No items found!',
-          'subject': ebayOptions.query
-        }
-        mailer(mailOptions);
+        console.log("no items to email")
       }
     });
 
